@@ -66,7 +66,6 @@ function getQuickPredictionDisplay(slmLabel: number, slmConfidence: number): Qui
 
 export default function Guest() {
   const [inputText, setInputText] = useState('');
-  const [fbPostIdInput, setFbPostIdInput] = useState('');
   const [isLoadingPredict, setIsLoadingPredict] = useState(false);
   const [isLoadingAnalyze, setIsLoadingAnalyze] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
@@ -179,7 +178,7 @@ export default function Guest() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           text: inputText,
-          fb_post_id: fbPostIdInput.trim() || null
+          fb_post_id: null
         }),
       });
 
@@ -220,7 +219,7 @@ export default function Guest() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             text: inputText,
-            fb_post_id: fbPostIdInput.trim() || null
+            fb_post_id: null
           }),
         });
 
@@ -248,7 +247,8 @@ export default function Guest() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           text: inputText,
-          fb_post_id: fbPostIdInput.trim() || null
+          fb_post_id: null,
+          record_id: currentPrediction ? currentPrediction.recordId : null
         }),
       });
 
@@ -274,7 +274,6 @@ export default function Guest() {
 
   const handleReset = () => {
     setInputText('');
-    setFbPostIdInput('');
     setPrediction(null);
     setAnalysis(null);
     setHasSearched(false);
