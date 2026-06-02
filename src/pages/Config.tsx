@@ -12,7 +12,7 @@ interface ConfigState {
 
 const DEFAULT_LLM_MODELS: Record<string, string> = {
   openai: 'Qwen/Qwen3-4B-AWQ',
-  genai: 'gemma-4-26b-a4b-it',
+  genai: 'gemini-3.1-flash-lite',
 };
 
 export default function Config() {
