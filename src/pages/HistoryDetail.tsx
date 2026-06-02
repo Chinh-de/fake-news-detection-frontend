@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Cpu, Sparkles, BookOpen, Layers, MessageSquare, Code, AlertTriangle, ExternalLink, Calendar } from 'lucide-react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Cpu, Sparkles, BookOpen, Layers, MessageSquare, Code, AlertTriangle, ExternalLink, Calendar, Trash2 } from 'lucide-react';
 
 interface ChunkEvidence {
   score: number;
@@ -34,12 +34,40 @@ interface AnalyzeResponse {
 
 export default function HistoryDetail() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [record, setRecord] = useState<AnalyzeResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
   const token = localStorage.getItem('admin_token');
+
+  const handleDelete = async () => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa bản ghi kiểm định #${id}? Hành động này không thể hoàn tác.`)) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`${API_URL}/api/history/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Lỗi khi xóa bản ghi lịch sử.');
+      }
+
+      alert('Đã xóa bản ghi thành công.');
+      navigate('/admin/history');
+    } catch (err: any) {
+      alert(err.message || 'Lỗi khi xóa bản ghi.');
+      setIsDeleting(false);
+    }
+  };
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -93,11 +121,24 @@ export default function HistoryDetail() {
       </div>
     );
   }
-
   const formatDate = (dateStr: string) => {
     try {
-      const date = new Date(dateStr);
-      return date.toLocaleString('vi-VN');
+      let isoStr = dateStr;
+      if (!isoStr.includes('T') && isoStr.includes(' ')) {
+        isoStr = isoStr.replace(' ', 'T');
+      }
+      if (!/Z|[+-]\d{2}(:\d{2})?$/.test(isoStr)) {
+        isoStr += 'Z';
+      }
+      const date = new Date(isoStr);
+      return date.toLocaleString('vi-VN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      });
     } catch (e) {
       return dateStr;
     }
@@ -124,7 +165,7 @@ export default function HistoryDetail() {
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <span className={`badge ${record.slm_label === 1 ? 'badge-fake' : 'badge-real'} text-xs px-3 py-1.5`}>
             SLM: {record.slm_label === 1 ? 'GIẢ' : 'THẬT'}
           </span>
@@ -133,6 +174,13 @@ export default function HistoryDetail() {
               LLM: {record.llm_label === 1 ? 'GIẢ' : 'THẬT'}
             </span>
           )}
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="btn py-1.5 px-3 text-xs bg-red-50 text-red-600 border border-red-200 hover:bg-red-600 hover:text-white transition-all disabled:opacity-50 inline-flex items-center gap-1.5 cursor-pointer ml-2"
+          >
+            <Trash2 size={12} /> {isDeleting ? 'Đang xóa...' : 'Xóa bản ghi'}
+          </button>
         </div>
       </div>
 

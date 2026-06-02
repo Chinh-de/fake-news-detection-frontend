@@ -15,6 +15,18 @@ const DEFAULT_LLM_MODELS: Record<string, string> = {
   genai: 'gemini-3.1-flash-lite',
 };
 
+const parseUtcDate = (dateStr: string) => {
+  if (!dateStr) return new Date();
+  let isoStr = dateStr;
+  if (!isoStr.includes('T') && isoStr.includes(' ')) {
+    isoStr = isoStr.replace(' ', 'T');
+  }
+  if (!/Z|[+-]\d{2}(:\d{2})?$/.test(isoStr)) {
+    isoStr += 'Z';
+  }
+  return new Date(isoStr);
+};
+
 export default function Config() {
   const [config, setConfig] = useState<ConfigState | null>(null);
   const [llmProvider, setLlmProvider] = useState('openai');
@@ -197,7 +209,15 @@ export default function Config() {
   const handleScheduleUpdate = async () => {
     if (!scheduleTime) return;
 
-    const confirmMsg = `Bạn có chắc chắn muốn lên lịch cập nhật mô hình SLM vào lúc ${new Date(scheduleTime).toLocaleString()}?`;
+    const localDate = new Date(scheduleTime);
+    const formattedLocal = localDate.toLocaleString('vi-VN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    const confirmMsg = `Bạn có chắc chắn muốn lên lịch cập nhật mô hình SLM vào lúc ${formattedLocal}?`;
     if (!window.confirm(confirmMsg)) {
       return;
     }
@@ -214,7 +234,7 @@ export default function Config() {
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          target_time: new Date(scheduleTime).toISOString(),
+          target_time: localDate.toISOString(),
         }),
       });
 
@@ -435,7 +455,13 @@ export default function Config() {
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-blue-50/60 p-3 rounded border border-blue-100 text-blue-800 text-xs">
                         <div>
                           <p className="font-semibold">Đã lên lịch cập nhật tự động:</p>
-                          <p className="mt-0.5">Thời gian: {new Date(modelStatus.scheduled_time).toLocaleString()}</p>
+                          <p className="mt-0.5">Thời gian: {parseUtcDate(modelStatus.scheduled_time).toLocaleString('vi-VN', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}</p>
                           <p className="font-mono mt-0.5 text-[10px] text-blue-600">SHA mục tiêu: {modelStatus.scheduled_sha}</p>
                         </div>
                         <button
@@ -566,8 +592,22 @@ export default function Config() {
                           </div>
 
                           <div className="text-text-muted text-[10px] space-y-0.5">
-                            <p>Yêu cầu lúc: {new Date(item.triggered_at).toLocaleString()}</p>
-                            <p>Hoàn tất lúc: {new Date(item.completed_at).toLocaleString()}</p>
+                            <p>Yêu cầu lúc: {parseUtcDate(item.triggered_at).toLocaleString('vi-VN', {
+                              year: 'numeric',
+                              month: '2-digit',
+                              day: '2-digit',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              second: '2-digit'
+                            })}</p>
+                            <p>Hoàn tất lúc: {parseUtcDate(item.completed_at).toLocaleString('vi-VN', {
+                              year: 'numeric',
+                              month: '2-digit',
+                              day: '2-digit',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              second: '2-digit'
+                            })}</p>
                           </div>
 
                           {item.error_message && (

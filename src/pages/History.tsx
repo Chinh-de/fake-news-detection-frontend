@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, AlertCircle, Filter, FileText, Check } from 'lucide-react';
+import { ArrowRight, AlertCircle, Filter, FileText, Check, Trash2 } from 'lucide-react';
 
 interface HistoryItem {
   id: number;
@@ -74,7 +74,14 @@ export default function History() {
 
   const formatDate = (dateStr: string) => {
     try {
-      const date = new Date(dateStr);
+      let isoStr = dateStr;
+      if (!isoStr.includes('T') && isoStr.includes(' ')) {
+        isoStr = isoStr.replace(' ', 'T');
+      }
+      if (!/Z|[+-]\d{2}(:\d{2})?$/.test(isoStr)) {
+        isoStr += 'Z';
+      }
+      const date = new Date(isoStr);
       return date.toLocaleString('vi-VN', {
         year: 'numeric',
         month: '2-digit',
@@ -84,6 +91,36 @@ export default function History() {
       });
     } catch (e) {
       return dateStr;
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa bản ghi kiểm định #${id}? Hành động này không thể hoàn tác.`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/history/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Lỗi khi xóa bản ghi lịch sử.');
+      }
+
+      setItems(prev => prev.filter(item => item.id !== id));
+      setTotalRecords(prev => Math.max(0, prev - 1));
+      
+      if (items.length === 1 && page > 1) {
+        setPage(p => p - 1);
+      } else {
+        fetchHistory();
+      }
+    } catch (err: any) {
+      alert(err.message || 'Lỗi khi xóa bản ghi.');
     }
   };
 
@@ -191,12 +228,22 @@ export default function History() {
                       {formatDate(item.created_at)}
                     </td>
                     <td className="p-5 pr-6 text-right">
-                      <Link
-                        to={`/admin/history/${item.id}`}
-                        className="inline-flex items-center justify-center p-1.5 rounded-lg bg-white border border-border-color text-text-secondary hover:text-text-primary hover:border-border-color-hover transition-all"
-                      >
-                        <ArrowRight size={14} />
-                      </Link>
+                      <div className="flex justify-end gap-2">
+                        <Link
+                          to={`/admin/history/${item.id}`}
+                          className="inline-flex items-center justify-center p-1.5 rounded-lg bg-white border border-border-color text-text-secondary hover:text-text-primary hover:border-border-color-hover transition-all"
+                          title="Xem chi tiết"
+                        >
+                          <ArrowRight size={14} />
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="inline-flex items-center justify-center p-1.5 rounded-lg bg-white border border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 transition-all cursor-pointer"
+                          title="Xóa dự đoán"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

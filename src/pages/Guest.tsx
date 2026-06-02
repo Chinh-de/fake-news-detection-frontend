@@ -207,34 +207,38 @@ export default function Guest() {
     setIsLoadingAnalyze(true);
     setErrorMsg('');
     setAnalysis(null);
-    setPrediction(null);
     setHasSearched(true);
 
-    // Step 1: Call quick prediction first to show early result
-    setIsLoadingPredict(true);
-    try {
-      const responsePredict = await fetch(`${API_URL}/api/predict`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          text: inputText,
-          fb_post_id: fbPostIdInput.trim() || null
-        }),
-      });
+    let currentPrediction = prediction;
 
-      if (responsePredict.ok) {
-        const dataPredict = await responsePredict.json();
-        setPrediction({
-          recordId: dataPredict.record_id,
-          slmLabel: dataPredict.slm_label,
-          slmConfidence: dataPredict.slm_confidence,
-          status: dataPredict.status,
+    // Call quick prediction if we don't have it yet
+    if (!currentPrediction) {
+      setIsLoadingPredict(true);
+      try {
+        const responsePredict = await fetch(`${API_URL}/api/predict`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            text: inputText,
+            fb_post_id: fbPostIdInput.trim() || null
+          }),
         });
+
+        if (responsePredict.ok) {
+          const dataPredict = await responsePredict.json();
+          currentPrediction = {
+            recordId: dataPredict.record_id,
+            slmLabel: dataPredict.slm_label,
+            slmConfidence: dataPredict.slm_confidence,
+            status: dataPredict.status,
+          };
+          setPrediction(currentPrediction);
+        }
+      } catch (errPredict) {
+        console.error("Predict error during analysis:", errPredict);
+      } finally {
+        setIsLoadingPredict(false);
       }
-    } catch (errPredict) {
-      console.error("Predict error during analysis:", errPredict);
-    } finally {
-      setIsLoadingPredict(false);
     }
 
     // Step 2: Call deep analysis API
@@ -329,8 +333,8 @@ export default function Guest() {
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-600 text-xs font-bold">
               <Sparkles size={14} /> Hệ thống kiểm chứng thông tin đa chiều
             </div>
-            <h1 className="text-3xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-blue-600 via-violet-600 to-indigo-600 bg-clip-text text-transparent">
-              Hệ thống xác minh tin tức
+            <h1 className="text-3xl md:text-5xl p-3 font-black tracking-tight bg-gradient-to-r from-blue-600 via-violet-600 to-indigo-600 bg-clip-text text-transparent">
+              Fake News Detection System
             </h1>
             <p className="text-text-secondary text-sm md:text-base max-w-xl mx-auto leading-relaxed">
               Công cụ nhận diện tin giả và tin sai sự thật tự động. Kết hợp giữa AI phân tích giọng điệu bài viết, 
@@ -360,17 +364,9 @@ export default function Guest() {
                   <button
                     type="submit"
                     disabled={isLoadingPredict || !inputText.trim()}
-                    className="btn btn-secondary py-2.5 px-4 text-xs font-bold flex-1 sm:flex-initial"
+                    className="btn btn-primary py-2.5 px-6 text-xs font-bold flex-1 sm:flex-initial pulse-glow"
                   >
-                    <Cpu size={14} /> Kiểm tra nhanh văn phong
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleAnalyze}
-                    disabled={isLoadingAnalyze || !inputText.trim()}
-                    className="btn btn-primary py-2.5 px-5 text-xs font-bold flex-1 sm:flex-initial pulse-glow"
-                  >
-                    <Sparkles size={14} /> Tìm kiếm & đối chiếu thực tế
+                    <Search size={14} /> Kiểm tra
                   </button>
               </div>
             </form>
