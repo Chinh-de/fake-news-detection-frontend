@@ -485,9 +485,10 @@ export default function MRCDHistory() {
                     const activeRoundId = selectedRoundForEvidence[record.id] || 1;
                     const activeRound = rounds.find(r => Number(r.round_id) === activeRoundId) || rounds[0];
 
-                    // Parse RAG, Wikipedia, and Few-shot for the active round if available, otherwise fallback to record
-                    const parsedWiki = parseJsonField(activeRound?.wiki_evidence || record.wiki_evidence);
-                    const parsedRag = parseJsonField(activeRound?.rag_evidence || record.rag_evidence);
+                    // Parse RAG/Wiki from round 1 (bootstrap only). Fewshot is per-round.
+                    const firstRound = rounds[0];
+                    const parsedWiki = parseJsonField(firstRound?.wiki_evidence || record.wiki_evidence);
+                    const parsedRag = parseJsonField(firstRound?.rag_evidence || record.rag_evidence);
                     const parsedFewshot = parseJsonField(activeRound?.fewshot_examples || record.fewshot_examples);
 
                     return (
@@ -642,24 +643,9 @@ export default function MRCDHistory() {
                             {/* Tab Content 2: Retrieval Tra cứu */}
                             {activeTab === 'retrieval' && (
                               <div className="space-y-4 w-full">
-                                {rounds.length > 1 && (
-                                  <div className="flex gap-2 items-center mb-1">
-                                    <span className="text-[10px] text-text-secondary uppercase font-bold">Xem theo vòng:</span>
-                                    {rounds.map((r) => (
-                                      <button
-                                        key={r.round_id}
-                                        onClick={() => setSelectedRoundForEvidence(prev => ({ ...prev, [record.id]: Number(r.round_id) }))}
-                                        className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-all cursor-pointer ${
-                                          activeRoundId === Number(r.round_id)
-                                            ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
-                                            : 'bg-white border-border-color text-text-secondary hover:bg-slate-50'
-                                        }`}
-                                      >
-                                        Vòng {r.round_id}
-                                      </button>
-                                    ))}
-                                  </div>
-                                )}
+                                <p className="text-[10px] text-text-muted">
+                                  * Bằng chứng RAG và Wiki được thu thập 1 lần (vòng 1) và dùng chung cho toàn bộ quy trình.
+                                </p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {/* RAG Evidence */}
                                 <div className="space-y-2">
