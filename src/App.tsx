@@ -7,6 +7,8 @@ import Dashboard from './pages/Dashboard';
 import HistoryList from './pages/History';
 import HistoryDetail from './pages/HistoryDetail';
 import Config from './pages/Config';
+import MRCDHistory from './pages/MRCDHistory';
+
 
 // Protected Route Wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -46,9 +48,8 @@ function Header({ token, onLogout }: { token: string | null; onLogout: () => voi
           <nav className="hidden md:flex items-center gap-6">
             <Link
               to="/"
-              className={`text-sm font-semibold transition-all ${
-                isActive('/') ? 'text-blue-600' : 'text-text-secondary hover:text-text-primary'
-              }`}
+              className={`text-sm font-semibold transition-all ${isActive('/') ? 'text-blue-600' : 'text-text-secondary hover:text-text-primary'
+                }`}
             >
               Trang Chủ
             </Link>
@@ -57,27 +58,34 @@ function Header({ token, onLogout }: { token: string | null; onLogout: () => voi
               <>
                 <Link
                   to="/admin/dashboard"
-                  className={`text-sm font-semibold flex items-center gap-1.5 transition-all ${
-                    isActive('/admin/dashboard') ? 'text-blue-600' : 'text-text-secondary hover:text-text-primary'
-                  }`}
+                  className={`text-sm font-semibold flex items-center gap-1.5 transition-all ${isActive('/admin/dashboard') ? 'text-blue-600' : 'text-text-secondary hover:text-text-primary'
+                    }`}
                 >
                   <Cpu size={14} /> Thống Kê
                 </Link>
                 <Link
                   to="/admin/history"
-                  className={`text-sm font-semibold flex items-center gap-1.5 transition-all ${
-                    isActive('/admin/history') || location.pathname.startsWith('/admin/history/')
+                  className={`text-sm font-semibold flex items-center gap-1.5 transition-all ${isActive('/admin/history') || location.pathname.startsWith('/admin/history/')
                       ? 'text-blue-600'
                       : 'text-text-secondary hover:text-text-primary'
-                  }`}
+                    }`}
                 >
-                  <History size={14} /> Lịch Sử
+                  <History size={14} /> Lịch Sử Dự Đoán
                 </Link>
                 <Link
+                  to="/admin/mrcd-history"
+                  className={`text-sm font-semibold flex items-center gap-1.5 transition-all ${isActive('/admin/mrcd-history')
+                      ? 'text-blue-600'
+                      : 'text-text-secondary hover:text-text-primary'
+                    }`}
+                >
+                  <Cpu size={14} /> Lịch Sử MRCD
+                </Link>
+
+                <Link
                   to="/admin/config"
-                  className={`text-sm font-semibold flex items-center gap-1.5 transition-all ${
-                    isActive('/admin/config') ? 'text-blue-600' : 'text-text-secondary hover:text-text-primary'
-                  }`}
+                  className={`text-sm font-semibold flex items-center gap-1.5 transition-all ${isActive('/admin/config') ? 'text-blue-600' : 'text-text-secondary hover:text-text-primary'
+                    }`}
                 >
                   <Settings size={14} /> Cấu Hình
                 </Link>
@@ -119,9 +127,8 @@ function Header({ token, onLogout }: { token: string | null; onLogout: () => voi
           <Link
             to="/"
             onClick={() => setIsOpen(false)}
-            className={`block py-2 text-sm font-semibold ${
-              isActive('/') ? 'text-blue-600' : 'text-text-secondary'
-            }`}
+            className={`block py-2 text-sm font-semibold ${isActive('/') ? 'text-blue-600' : 'text-text-secondary'
+              }`}
           >
             Trang Chủ
           </Link>
@@ -131,29 +138,37 @@ function Header({ token, onLogout }: { token: string | null; onLogout: () => voi
               <Link
                 to="/admin/dashboard"
                 onClick={() => setIsOpen(false)}
-                className={`py-2 text-sm font-semibold flex items-center gap-2 ${
-                  isActive('/admin/dashboard') ? 'text-blue-600' : 'text-text-secondary'
-                }`}
+                className={`py-2 text-sm font-semibold flex items-center gap-2 ${isActive('/admin/dashboard') ? 'text-blue-600' : 'text-text-secondary'
+                  }`}
               >
                 <Cpu size={14} /> Thống Kê
               </Link>
               <Link
                 to="/admin/history"
                 onClick={() => setIsOpen(false)}
-                className={`py-2 text-sm font-semibold flex items-center gap-2 ${
-                  isActive('/admin/history') || location.pathname.startsWith('/admin/history/')
+                className={`py-2 text-sm font-semibold flex items-center gap-2 ${isActive('/admin/history') || location.pathname.startsWith('/admin/history/')
                     ? 'text-blue-600'
                     : 'text-text-secondary'
-                }`}
+                  }`}
               >
-                <History size={14} /> Lịch Sử
+                <History size={14} /> Lịch Sử Dự Đoán
               </Link>
+              <Link
+                to="/admin/mrcd-history"
+                onClick={() => setIsOpen(false)}
+                className={`py-2 text-sm font-semibold flex items-center gap-2 ${isActive('/admin/mrcd-history')
+                    ? 'text-blue-600'
+                    : 'text-text-secondary'
+                  }`}
+              >
+                <Cpu size={14} /> Lịch Sử MRCD
+              </Link>
+
               <Link
                 to="/admin/config"
                 onClick={() => setIsOpen(false)}
-                className={`py-2 text-sm font-semibold flex items-center gap-2 ${
-                  isActive('/admin/config') ? 'text-blue-600' : 'text-text-secondary'
-                }`}
+                className={`py-2 text-sm font-semibold flex items-center gap-2 ${isActive('/admin/config') ? 'text-blue-600' : 'text-text-secondary'
+                  }`}
               >
                 <Settings size={14} /> Cấu Hình
               </Link>
@@ -200,12 +215,12 @@ export default function App() {
     <BrowserRouter>
       <div className="app-container">
         <Header token={token} onLogout={handleLogout} />
-        
+
         <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           <Routes>
             <Route path="/" element={<Guest />} />
             <Route path="/admin/login" element={<Login onLogin={handleLogin} />} />
-            
+
             <Route
               path="/admin/dashboard"
               element={
@@ -222,6 +237,15 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/mrcd-history"
+              element={
+                <ProtectedRoute>
+                  <MRCDHistory />
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/admin/history/:id"
               element={
