@@ -213,7 +213,7 @@ export default function History() {
                             <span className={`badge ${item.xgboost_label === 1 ? 'badge-fake' : 'badge-real'} text-[9px]`} title="XGBoost">
                               XGB: {item.xgboost_label === 1 ? 'GIẢ' : 'THẬT'}
                             </span>
-                            <div className="text-[9px] text-text-muted">{(item.xgboost_confidence * 100).toFixed(0)}% tự tin</div>
+                            <div className="text-[9px] text-text-muted">{((item.xgboost_confidence ?? 0) * 100).toFixed(0)}% tự tin</div>
                           </div>
                         )}
                       </div>

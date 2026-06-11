@@ -258,7 +258,7 @@ export default function HistoryDetail() {
                 </div>
                 <div className="bg-slate-50 p-5 rounded-lg border border-border-color">
                   <div className="text-[10px] text-text-muted font-bold uppercase tracking-wider mb-1">Độ tự tin</div>
-                  <div className="text-base font-extrabold text-text-primary">{(record.xgboost_confidence * 100).toFixed(2)}%</div>
+                  <div className="text-base font-extrabold text-text-primary">{((record.xgboost_confidence ?? 0) * 100).toFixed(2)}%</div>
                 </div>
               </div>
             </div>
