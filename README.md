@@ -1,73 +1,72 @@
-# React + TypeScript + Vite
+# Fake News Detection Frontend (React + TS + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Giao diện Web tương tác (Frontend) thuộc hệ thống kiểm chứng tin giả **Fake News Detection**, được xây dựng trên nền tảng **React**, **TypeScript** và công cụ build **Vite**.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🎨 Tính năng chính
+- **Bảng điều khiển kiểm chứng (Guest Dashboard)**: Dán bài viết để nhận kết quả phân tích nhanh từ SLM, XGBoost và kích hoạt RAG kiểm chứng chéo tin tức.
+- **Trình quản lý lịch sử (Admin History)**: Liệt kê, tìm kiếm, phân trang và bộ lọc trạng thái các bài viết đã kiểm duyệt trong hệ thống.
+- **Trình bày bằng chứng trực quan**: Hiển thị thẻ kết quả đồng nhất/mâu thuẫn giữa các mô hình AI, băng chuyền (carousel) thực thể Wikipedia, danh sách trích đoạn báo chí đối chiếu kèm link liên kết gốc.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠️ Công nghệ sử dụng
+- **React 18** & **TypeScript**
+- **Vite**: Bộ công cụ đóng gói và chạy Hot Module Replacement (HMR) tốc độ cao.
+- **CSS**: Hệ thống giao diện tối ưu hiệu ứng chuyển động mượt mà (Glassmorphic) & đáp ứng thiết bị (Responsive).
+- **React Router DOM**: Điều hướng trang phía máy khách (Client-side routing).
+- **Lucide React**: Thư viện biểu tượng thiết kế giao diện.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📋 Yêu cầu hệ thống
+- **Node.js**: Phiên bản `18.x` hoặc `20.x` trở lên.
+- **npm** (đi kèm khi cài Node.js).
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🚀 Hướng dẫn cài đặt & Chạy cục bộ (Local)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Bước 1: Di chuyển tới thư mục Frontend
+```bash
+cd Frontend
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Bước 2: Cài đặt các gói thư viện Node
+```bash
+npm install
 ```
+
+### Bước 3: Cấu hình tệp môi trường `.env`
+Tạo tệp `.env` để cấu hình địa chỉ cổng kết nối đến máy chủ Backend API:
+```bash
+cp .env.example .env
+```
+Nội dung tệp cấu hình `.env` mặc định:
+```env
+VITE_API_URL=http://localhost:8000
+```
+*Lưu ý: Bạn có thể thay đổi đường dẫn này thành URL máy chủ Backend chạy thực tế (ví dụ: liên kết Hugging Face Space).*
+
+### Bước 4: Khởi chạy môi trường phát triển (Dev Server)
+```bash
+npm run dev
+```
+Giao diện sẽ chạy tại địa chỉ: `http://localhost:5173` (hoặc cổng hiển thị trên terminal).
+
+---
+
+## 📦 Đóng gói ứng dụng (Production Build)
+Để biên dịch tối ưu tài nguyên tĩnh chuẩn bị đưa lên các môi trường lưu trữ Hosting:
+```bash
+npm run build
+```
+Thư mục đầu ra sau khi build xong sẽ là `/dist`.
+
+---
+
+## ☁️ Triển khai lên Vercel
+Mã nguồn đã đi kèm tệp [vercel.json](./vercel.json) để xử lý cơ chế định tuyến Single Page Application (SPA). 
+
+Khi bạn deploy thư mục này lên **Vercel**, máy chủ sẽ tự động cấu hình điều hướng tất cả các đường dẫn trực tiếp (Direct URL) về tệp `index.html` của React, tránh tình trạng gặp lỗi **404: NOT_FOUND** khi tải lại trang hoặc truy cập liên kết sâu.
