@@ -30,6 +30,8 @@ interface AnalyzeResponse {
   fewshot_examples: FewshotDemo[] | null;
   final_prompt: string | null;
   created_at: string;
+  xgboost_label: number | null;
+  xgboost_confidence: number | null;
 }
 
 export default function HistoryDetail() {
@@ -240,6 +242,27 @@ export default function HistoryDetail() {
               </div>
             </div>
           </div>
+
+          {/* XGBoost Output */}
+          {record.xgboost_label !== undefined && record.xgboost_label !== null && (
+            <div className="glass-panel p-6 md:p-7 section-stack">
+              <h3 className="text-sm font-bold text-text-secondary uppercase tracking-wider flex items-center gap-2">
+                <Layers size={16} className="text-violet-600" /> Kết quả dự đoán phụ XGBoost
+              </h3>
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div className="bg-slate-50 p-5 rounded-lg border border-border-color">
+                  <div className="text-[10px] text-text-muted font-bold uppercase tracking-wider mb-1">Dự đoán</div>
+                  <span className={`badge ${record.xgboost_label === 1 ? 'badge-fake' : 'badge-real'} text-xs`}>
+                    {record.xgboost_label === 1 ? 'GIẢ MẠO' : 'XÁC THỰC'}
+                  </span>
+                </div>
+                <div className="bg-slate-50 p-5 rounded-lg border border-border-color">
+                  <div className="text-[10px] text-text-muted font-bold uppercase tracking-wider mb-1">Độ tự tin</div>
+                  <div className="text-base font-extrabold text-text-primary">{(record.xgboost_confidence * 100).toFixed(2)}%</div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* LLM Output */}
           <div className="glass-panel p-6 md:p-7 section-stack">

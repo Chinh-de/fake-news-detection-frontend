@@ -27,6 +27,8 @@ interface AnalyzeResponse {
   wiki_evidence: Record<string, string> | null;
   rag_evidence: ChunkEvidence[] | null;
   fewshot_examples: FewshotDemo[] | null;
+  xgboost_label: number | null;
+  xgboost_confidence: number | null;
 }
 
 type QuickPredictionDisplay = {
@@ -77,6 +79,8 @@ export default function Guest() {
     slmLabel: number;
     slmConfidence: number;
     status: string;
+    xgboostLabel?: number | null;
+    xgboostConfidence?: number | null;
   } | null>(null);
   
   const [analysis, setAnalysis] = useState<AnalyzeResponse | null>(null);
@@ -192,6 +196,8 @@ export default function Guest() {
         slmLabel: data.slm_label,
         slmConfidence: data.slm_confidence,
         status: data.status,
+        xgboostLabel: data.xgboost_label,
+        xgboostConfidence: data.xgboost_confidence,
       });
     } catch (err: any) {
       setErrorMsg(err.message || 'Lỗi hệ thống khi dự đoán.');
@@ -230,6 +236,8 @@ export default function Guest() {
             slmLabel: dataPredict.slm_label,
             slmConfidence: dataPredict.slm_confidence,
             status: dataPredict.status,
+            xgboostLabel: dataPredict.xgboost_label,
+            xgboostConfidence: dataPredict.xgboost_confidence,
           };
           setPrediction(currentPrediction);
         }
@@ -264,6 +272,8 @@ export default function Guest() {
         slmLabel: data.slm_label,
         slmConfidence: data.slm_confidence,
         status: 'completed',
+        xgboostLabel: data.xgboost_label,
+        xgboostConfidence: data.xgboost_confidence,
       });
     } catch (err: any) {
       setErrorMsg(err.message || 'Lỗi hệ thống khi phân tích.');
@@ -500,6 +510,39 @@ export default function Guest() {
                   <p className="text-[10px] text-text-muted leading-relaxed">
                     AI phân tích cách dùng từ, cấu trúc câu và giọng điệu để phát hiện dấu hiệu giật gân, nói quá phổ biến của tin giả mà không cần tra cứu Internet.
                   </p>
+
+                  {prediction.xgboostLabel !== undefined && prediction.xgboostLabel !== null && (
+                    <div className="border-t border-slate-100 pt-4 mt-4 space-y-3">
+                      <div className="flex items-center gap-1.5">
+                        <Layers size={13} className="text-violet-600" />
+                        <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Dự đoán phụ (XGBoost + TF-IDF)</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-text-secondary text-[11px]">Đánh giá:</span>
+                        <span className={`badge text-[10px] px-2.5 py-0.5 font-bold ${
+                          prediction.xgboostLabel === 1
+                            ? 'bg-rose-100 text-rose-800 border-rose-200'
+                            : 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                        }`}>
+                          {prediction.xgboostLabel === 1 ? 'Tin sai lệch' : 'Tin chính xác'}
+                        </span>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] text-text-secondary">
+                          <span>Độ tự tin:</span>
+                          <span className="font-bold">
+                            {prediction.xgboostConfidence ? (prediction.xgboostConfidence * 100).toFixed(1) : 0}%
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden border border-border-color">
+                          <div
+                            className={`h-full rounded-full ${prediction.xgboostLabel === 1 ? 'bg-rose-500' : 'bg-emerald-500'}`}
+                            style={{ width: `${(prediction.xgboostConfidence || 0) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : null}
 

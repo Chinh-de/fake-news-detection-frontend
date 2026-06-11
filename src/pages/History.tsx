@@ -11,6 +11,8 @@ interface HistoryItem {
   llm_label: number;
   is_trained: boolean;
   created_at: string;
+  xgboost_label?: number | null;
+  xgboost_confidence?: number | null;
 }
 
 export default function History() {
@@ -175,7 +177,7 @@ export default function History() {
                   <th className="p-5 pl-6">ID bản ghi</th>
                   <th className="p-5">Nội dung trích đoạn</th>
                   <th className="p-5">Nguồn/FB ID</th>
-                  <th className="p-5">Dự đoán SLM</th>
+                  <th className="p-5 whitespace-nowrap">Kết quả dự đoán (SLM/XGB)</th>
                   <th className="p-5">Dự đoán LLM</th>
                   <th className="p-5">isTrained</th>
                   <th className="p-5">Thời gian</th>
@@ -198,12 +200,22 @@ export default function History() {
                         <span className="text-text-muted italic">Nhập web</span>
                       )}
                     </td>
-                    <td className="p-5">
-                      <div className="space-y-1">
-                        <span className={`badge ${item.slm_label === 1 ? 'badge-fake' : 'badge-real'} text-[10px]`}>
-                          {item.slm_label === 1 ? 'GIẢ' : 'THẬT'}
-                        </span>
-                        <div className="text-[10px] text-text-muted">{(item.slm_confidence * 100).toFixed(0)}% tự tin</div>
+                    <td className="p-5 whitespace-nowrap">
+                      <div className="flex items-center gap-4">
+                        <div>
+                          <span className={`badge ${item.slm_label === 1 ? 'badge-fake' : 'badge-real'} text-[9px]`} title="PhoBERT (SLM)">
+                            SLM: {item.slm_label === 1 ? 'GIẢ' : 'THẬT'}
+                          </span>
+                          <div className="text-[9px] text-text-muted">{(item.slm_confidence * 100).toFixed(0)}% tự tin</div>
+                        </div>
+                        {item.xgboost_label !== undefined && item.xgboost_label !== null && (
+                          <div className="border-l border-slate-200 pl-4">
+                            <span className={`badge ${item.xgboost_label === 1 ? 'badge-fake' : 'badge-real'} text-[9px]`} title="XGBoost">
+                              XGB: {item.xgboost_label === 1 ? 'GIẢ' : 'THẬT'}
+                            </span>
+                            <div className="text-[9px] text-text-muted">{(item.xgboost_confidence * 100).toFixed(0)}% tự tin</div>
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td className="p-5">
