@@ -194,7 +194,7 @@ export default function History() {
                     <td className="p-5 font-mono text-xs text-text-secondary">
                       {item.fb_post_id ? (
                         <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100">
-                          {item.fb_post_id.substring(0, 15)}...
+                          {item.fb_post_id.substring(0, 8)}...
                         </span>
                       ) : (
                         <span className="text-text-muted italic">Nhập web</span>
